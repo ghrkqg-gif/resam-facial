@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import EventSection from "@/components/EventSection";
 import About from "@/components/About";
 import Cases from "@/components/Cases";
 import Types from "@/components/Types";
@@ -19,6 +20,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <EventSection />
         <About />
         <Cases />
         <Types />
