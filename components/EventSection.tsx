@@ -22,14 +22,9 @@ function parseCSV(text: string): Event[] {
     let inQuote = false;
     for (let i = 0; i < line.length; i++) {
       const ch = line[i];
-      if (ch === '"') {
-        inQuote = !inQuote;
-      } else if (ch === "," && !inQuote) {
-        fields.push(cur.trim());
-        cur = "";
-      } else {
-        cur += ch;
-      }
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (ch === "," && !inQuote) { fields.push(cur.trim()); cur = ""; }
+      else { cur += ch; }
     }
     fields.push(cur.trim());
     const obj: Record<string, string> = {};
@@ -75,9 +70,12 @@ export default function EventSection() {
   const categories = ["전체", ...Array.from(new Set(items.map((i) => i.category).filter(Boolean)))];
   const filtered = filter === "전체" ? items : items.filter((i) => i.category === filter);
 
+  const countOf = (cat: string) =>
+    cat === "전체" ? items.length : items.filter((i) => i.category === cat).length;
+
   return (
     <section id="events" ref={ref} className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="flex flex-col lg:flex-row gap-8">
 
           {/* 왼쪽 사이드바 */}
@@ -85,26 +83,31 @@ export default function EventSection() {
             initial={{ opacity: 0, x: -20 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.4 }}
-            className="lg:w-44 flex-shrink-0"
+            className="lg:w-48 flex-shrink-0"
           >
             <div className="lg:sticky lg:top-24">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">카테고리</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">카테고리</p>
               <div className="flex lg:flex-col gap-2 flex-wrap">
                 {loading
                   ? [1, 2, 3].map((i) => (
-                      <div key={i} className="h-9 bg-gray-200 rounded-xl animate-pulse w-24 lg:w-full" />
+                      <div key={i} className="h-10 bg-gray-200 rounded-xl animate-pulse w-28 lg:w-full" />
                     ))
                   : categories.map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setFilter(cat)}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                           filter === cat
-                            ? "bg-teal-600 text-white shadow-sm"
+                            ? "bg-indigo-600 text-white shadow-sm shadow-indigo-200"
                             : "text-gray-500 hover:text-gray-800 hover:bg-white"
                         }`}
                       >
-                        {cat}
+                        <span>{cat}</span>
+                        <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
+                          filter === cat ? "bg-white/20 text-white" : "bg-gray-100 text-gray-400"
+                        }`}>
+                          {countOf(cat)}
+                        </span>
                       </button>
                     ))}
               </div>
@@ -113,7 +116,6 @@ export default function EventSection() {
 
           {/* 오른쪽 카드 그리드 */}
           <div className="flex-1 min-w-0">
-            {/* 헤더 */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -128,7 +130,6 @@ export default function EventSection() {
               </h2>
             </motion.div>
 
-            {/* 카드 */}
             {loading ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -144,7 +145,7 @@ export default function EventSection() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 text-gray-300">
-                <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-14 h-14 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm">진행 중인 이벤트가 없습니다.</p>
@@ -167,10 +168,10 @@ export default function EventSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: i * 0.05 }}
-                        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
+                        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col"
                       >
-                        {/* 이미지 */}
-                        <div className="relative h-48 overflow-hidden bg-teal-50">
+                        {/* 이미지 (세로형: 위) */}
+                        <div className="relative h-48 overflow-hidden bg-indigo-50 flex-shrink-0">
                           {event.image_url ? (
                             <img
                               src={event.image_url}
@@ -178,19 +179,19 @@ export default function EventSection() {
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-teal-50 to-cyan-50">
-                              <div className="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center">
-                                <svg className="w-7 h-7 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-indigo-50 to-violet-50">
+                              <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center">
+                                <svg className="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                               </div>
-                              <span className="text-teal-300 text-xs">이미지 준비 중</span>
+                              <span className="text-indigo-300 text-xs">이미지 준비 중</span>
                             </div>
                           )}
-                          {/* 할인율 뱃지 */}
+                          {/* 할인 뱃지 */}
                           {discount !== null && (
-                            <div className="absolute top-3 left-3 bg-teal-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
-                              {discount}% 할인
+                            <div className="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-black px-2.5 py-1 rounded-lg tracking-tight">
+                              {discount}% OFF
                             </div>
                           )}
                           {/* 카테고리 뱃지 */}
@@ -201,12 +202,12 @@ export default function EventSection() {
                           )}
                         </div>
 
-                        {/* 내용 */}
-                        <div className="p-4">
-                          <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-3 line-clamp-2">
+                        {/* 정보 (세로형: 아래) */}
+                        <div className="p-4 flex flex-col flex-1">
+                          <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-3 line-clamp-2 flex-1">
                             {event.title}
                           </h3>
-                          <div className="flex items-end justify-between">
+                          <div className="flex items-end justify-between mt-auto">
                             <div>
                               {event.original_price && (
                                 <p className="text-gray-300 text-xs line-through mb-0.5">
@@ -214,19 +215,19 @@ export default function EventSection() {
                                 </p>
                               )}
                               {event.sale_price && (
-                                <p className="text-gray-900 font-black text-base">
+                                <p className="text-gray-900 font-black text-lg leading-none">
                                   {formatPrice(event.sale_price)}
                                 </p>
                               )}
                               {discount !== null && (
-                                <p className="text-teal-600 text-xs font-semibold mt-0.5">
-                                  {discount}% 절약
+                                <p className="text-indigo-500 text-xs font-semibold mt-1">
+                                  {discount}% 할인 적용
                                 </p>
                               )}
                             </div>
                             <a
                               href="tel:031-713-2784"
-                              className="flex-shrink-0 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors duration-200"
+                              className="flex-shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors duration-200"
                             >
                               전화 신청
                             </a>
