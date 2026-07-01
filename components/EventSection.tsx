@@ -51,30 +51,12 @@ function calcDiscount(original: string, sale: string): number | null {
   return Math.round(((o - s) / o) * 100);
 }
 
-const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  안면비대칭: { bg: "bg-teal-500/20", text: "text-teal-300", border: "border-teal-500/50" },
-  두상교정: { bg: "bg-cyan-500/20", text: "text-cyan-300", border: "border-cyan-500/50" },
-  순수본교정: { bg: "bg-emerald-500/20", text: "text-emerald-300", border: "border-emerald-500/50" },
-  연예인교정: { bg: "bg-amber-500/20", text: "text-amber-300", border: "border-amber-500/50" },
-  비강벌룬추나: { bg: "bg-purple-500/20", text: "text-purple-300", border: "border-purple-500/50" },
-};
-
-function getCategoryStyle(cat: string) {
-  return (
-    CATEGORY_COLORS[cat] ?? {
-      bg: "bg-white/10",
-      text: "text-teal-300",
-      border: "border-white/20",
-    }
-  );
-}
-
 export default function EventSection() {
   const [items, setItems] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("전체");
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   useEffect(() => {
     const SHEET_ID = "1AafPeCJmInBp0Few4r3JpfO201Q0jMI5IjGzqzELzbo";
@@ -94,97 +76,78 @@ export default function EventSection() {
   const filtered = filter === "전체" ? items : items.filter((i) => i.category === filter);
 
   return (
-    <section
-      id="events"
-      ref={ref}
-      className="py-24 bg-gradient-to-br from-[#0f172a] via-[#0d2d2a] to-[#0f172a] relative overflow-hidden"
-    >
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500 rounded-full blur-3xl opacity-5" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-cyan-500 rounded-full blur-3xl opacity-5" />
-      </div>
-
-      <div className="relative max-w-7xl mx-auto px-6">
-        {/* 헤더 */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14"
-        >
-          <span className="inline-block bg-white/10 text-teal-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
-            진행 중인 이벤트
-          </span>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
-            리샘 특가 이벤트
-          </h2>
-          <p className="text-teal-200/60 max-w-xl mx-auto">
-            지금 바로 신청하면 더 저렴하게 시작할 수 있습니다.
-          </p>
-        </motion.div>
-
+    <section id="events" ref={ref} className="bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* 왼쪽 사이드바 — 카테고리 필터 */}
+
+          {/* 왼쪽 사이드바 */}
           <motion.aside
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:w-48 flex-shrink-0"
+            transition={{ duration: 0.4 }}
+            className="lg:w-44 flex-shrink-0"
           >
-            <div className="lg:sticky lg:top-24 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-4">
-              <p className="text-teal-400 text-xs font-bold uppercase tracking-widest mb-3 px-1">
-                카테고리
-              </p>
+            <div className="lg:sticky lg:top-24">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">카테고리</p>
               <div className="flex lg:flex-col gap-2 flex-wrap">
                 {loading
                   ? [1, 2, 3].map((i) => (
-                      <div key={i} className="h-9 bg-white/5 rounded-xl animate-pulse w-full" />
+                      <div key={i} className="h-9 bg-gray-200 rounded-xl animate-pulse w-24 lg:w-full" />
                     ))
-                  : categories.map((cat) => {
-                      const style = getCategoryStyle(cat);
-                      const isActive = filter === cat;
-                      return (
-                        <button
-                          key={cat}
-                          onClick={() => setFilter(cat)}
-                          className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
-                            isActive
-                              ? `${style.bg} ${style.text} ${style.border}`
-                              : "text-white/50 border-transparent hover:text-white/80 hover:bg-white/5"
-                          }`}
-                        >
-                          {cat}
-                          {isActive && (
-                            <span className="ml-1 text-xs opacity-70">
-                              ({filter === "전체" ? items.length : filtered.length})
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                  : categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setFilter(cat)}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          filter === cat
+                            ? "bg-teal-600 text-white shadow-sm"
+                            : "text-gray-500 hover:text-gray-800 hover:bg-white"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
               </div>
             </div>
           </motion.aside>
 
           {/* 오른쪽 카드 그리드 */}
           <div className="flex-1 min-w-0">
+            {/* 헤더 */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.4 }}
+              className="flex items-center justify-between mb-6"
+            >
+              <h2 className="text-lg font-bold text-gray-800">
+                {filter === "전체" ? "전체 이벤트" : filter}
+                <span className="ml-2 text-sm font-normal text-gray-400">
+                  {loading ? "" : `${filtered.length}개`}
+                </span>
+              </h2>
+            </motion.div>
+
+            {/* 카드 */}
             {loading ? (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-white/5 rounded-3xl overflow-hidden animate-pulse">
-                    <div className="h-44 bg-white/5" />
-                    <div className="p-5 space-y-3">
-                      <div className="h-4 bg-white/5 rounded-full w-3/4" />
-                      <div className="h-3 bg-white/5 rounded-full w-1/2" />
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                    <div className="h-48 bg-gray-100" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-100 rounded w-3/4" />
+                      <div className="h-3 bg-gray-100 rounded w-1/2" />
+                      <div className="h-5 bg-gray-100 rounded w-1/3" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-teal-300/40">
-                <div className="text-5xl mb-4">🎉</div>
-                <p>진행 중인 이벤트가 없습니다.</p>
+              <div className="flex flex-col items-center justify-center py-32 text-gray-300">
+                <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm">진행 중인 이벤트가 없습니다.</p>
               </div>
             ) : (
               <AnimatePresence mode="popLayout">
@@ -198,75 +161,74 @@ export default function EventSection() {
                 >
                   {filtered.map((event, i) => {
                     const discount = calcDiscount(event.original_price, event.sale_price);
-                    const style = getCategoryStyle(event.category);
                     return (
                       <motion.div
                         key={event.id || i}
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: i * 0.07 }}
-                        className="group bg-white/5 backdrop-blur border border-white/10 hover:border-teal-400/40 rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-teal-900/40"
+                        transition={{ duration: 0.3, delay: i * 0.05 }}
+                        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
                       >
                         {/* 이미지 */}
-                        <div className="relative h-44 bg-gradient-to-br from-teal-900/60 to-cyan-900/40 overflow-hidden">
+                        <div className="relative h-48 overflow-hidden bg-teal-50">
                           {event.image_url ? (
                             <img
                               src={event.image_url}
                               alt={event.title}
-                              className="w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-teal-400/30">
-                              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              <span className="text-xs">이미지 없음</span>
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-teal-50 to-cyan-50">
+                              <div className="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center">
+                                <svg className="w-7 h-7 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <span className="text-teal-300 text-xs">이미지 준비 중</span>
                             </div>
                           )}
-
                           {/* 할인율 뱃지 */}
                           {discount !== null && (
-                            <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-lg">
-                              {discount}% OFF
+                            <div className="absolute top-3 left-3 bg-teal-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
+                              {discount}% 할인
                             </div>
                           )}
-
                           {/* 카테고리 뱃지 */}
                           {event.category && (
-                            <div
-                              className={`absolute top-3 right-3 ${style.bg} ${style.text} border ${style.border} backdrop-blur text-xs font-semibold px-2.5 py-1 rounded-full`}
-                            >
+                            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur text-gray-600 text-xs font-medium px-2.5 py-1 rounded-lg">
                               {event.category}
                             </div>
                           )}
                         </div>
 
                         {/* 내용 */}
-                        <div className="p-5">
-                          <h3 className="font-bold text-white text-sm leading-snug mb-4 line-clamp-2 group-hover:text-teal-300 transition-colors">
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-800 text-sm leading-snug mb-3 line-clamp-2">
                             {event.title}
                           </h3>
-
                           <div className="flex items-end justify-between">
                             <div>
                               {event.original_price && (
-                                <p className="text-white/30 text-xs line-through mb-0.5">
+                                <p className="text-gray-300 text-xs line-through mb-0.5">
                                   {formatPrice(event.original_price)}
                                 </p>
                               )}
                               {event.sale_price && (
-                                <p className="text-teal-300 font-black text-lg">
+                                <p className="text-gray-900 font-black text-base">
                                   {formatPrice(event.sale_price)}
                                 </p>
                               )}
+                              {discount !== null && (
+                                <p className="text-teal-600 text-xs font-semibold mt-0.5">
+                                  {discount}% 절약
+                                </p>
+                              )}
                             </div>
-
                             <a
-                              href="#consult"
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex-shrink-0 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-teal-700/40"
+                              href="tel:031-713-2784"
+                              className="flex-shrink-0 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors duration-200"
                             >
-                              신청하기
+                              전화 신청
                             </a>
                           </div>
                         </div>
